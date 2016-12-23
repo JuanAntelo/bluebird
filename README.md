@@ -49,3 +49,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
+Include Bluebird - it's a superset of ES6 promises and you can swap it right inside, it has a richer API, it's faster and it has amazing stack traces. It's built with debugging in mind and includes great error handling facilities.
+
+Once you've included Bluebird, call:
+
+Promise.longStackTraces();
+Which will slow it down a bit (it'll still be very fast) and will give you amazing error messages. For example:
+
+Promise.resolve().then(function outer() {
+    return Promise.resolve().then(function inner() {
+        return Promise.resolve().then(function evenMoreInner() {
+            a.b.c.d()
+        });
+    });
+});
+In native promises - this will be a silent failure and will be very hard to debug - with Bluebird promises this will show a big red error in your console by default giving you:
+
+ReferenceError: a is not defined
+    at evenMoreInner (<anonymous>:6:13)
+From previous event:
+    at inner (<anonymous>:5:24)
+From previous event:
+    at outer (<anonymous>:4:20)
+From previous event:
+    at <anonymous>:3:9
+    at Object.InjectedScript._evaluateOn (<anonymous>:581:39)
+    at Object.InjectedScript._evaluateAndWrap (<anonymous>:540:52)
+    at Object.InjectedScript.evaluate (<anonymous>:459:21)
+Once you're done debugging - you can swap it out and go back to native promises. Personally I value knowing I have errors in production so I don't recommend it but it's certainly doable.
